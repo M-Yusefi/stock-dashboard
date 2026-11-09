@@ -1,0 +1,21 @@
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+  <div class="container d-flex flex-row gap-4">
+    <a class="navbar-brand" href="/"> Stock Dashboard </a>
+
+    <form id="ticker-search-form" method="post" class="d-flex gap-2">
+      {% csrf_token %}
+      <input
+        type="text"
+        id="ticker-input"
+        name="ticker"
+        class="form-control"
+        autocapitalize="characters"
+        oninput="this.value = this.value.toUpperCase()"
+        placeholder="Search stock ticker, e.g., AAPL"
+        required
+      />
+
+      <button type="submit" class="btn btn-primary">Search</button>
+    </form>
+  </div>
+</nav>
