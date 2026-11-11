@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse
-from .services import api_res
-
+from .services.services import api_res
+from .analytics.stock_analysis import analyse
 
 def index(request):
     return render(request, 'stocks/index.html')
@@ -10,6 +10,7 @@ def index(request):
 def search_stock(request):
     ticker = request.GET.get("ticker")
 
-    data = api_res(ticker)
+    api_response = api_res(ticker)
+    analyse_results = analyse(api_response)
 
-    return JsonResponse(data, safe=False)
+    return JsonResponse(analyse_results, safe=False)

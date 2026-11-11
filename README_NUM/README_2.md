@@ -1,6 +1,6 @@
 # Week 2 – Data analyseren en visualiseren
 
-**Startdatum:** 09-11-2026  
+**Startdatum:** 01-11-2026  
 **Einddatum:** 16-11-2026
 
 

@@ -24,13 +24,9 @@ function searchTicker() {
       return response.json();
     })
     .then((data) => {
-      result = data;
-
-      resContainer.innerHTML(result)
+      console.log(data)
     })
     .catch((error) => {
       console.error(error);
     });
-
-    
 }
