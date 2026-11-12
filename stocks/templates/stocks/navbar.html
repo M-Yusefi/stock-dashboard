@@ -1,21 +1,54 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-  <div class="container d-flex flex-row gap-4">
-    <a class="navbar-brand" href="/"> Stock Dashboard </a>
 
-    <form id="ticker-search-form" method="post" class="d-flex gap-2">
-      {% csrf_token %}
-      <input
-        type="text"
-        id="ticker-input"
-        name="ticker"
-        class="form-control"
-        autocapitalize="characters"
-        oninput="this.value = this.value.toUpperCase()"
-        placeholder="Search stock ticker, e.g., AAPL"
-        required
-      />
+{% load static %}
 
-      <button type="submit" class="btn btn-primary">Search</button>
+<nav id="navbar" class="navbar">
+
+    <!-- Links: Logo en naam -->
+    <a id="navbar_link" href="/stocks">
+        <img
+            src="{% static 'images/logo-STAB.jpg' %}"
+            alt="Stock Dashboard logo"
+        />
+        <span>Stock Dashboard</span>
+    </a>
+
+    <!-- Midden: Searchbar -->
+    <form id="ticker-search-form" method="get">
+        <input
+            type="text"
+            id="ticker-input"
+            name="ticker"
+            autocapitalize="characters"
+            oninput="this.value = this.value.toUpperCase()"
+            placeholder="Search stock ticker, e.g. AAPL"
+            autocomplete="off"
+            required
+        />
+
+        <button type="submit">Search</button>
     </form>
-  </div>
+
+    <!-- Rechts: Account navigatie -->
+    <div class="navbar-actions">
+
+        <a href="/register" class="navbar-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                <circle cx="10" cy="7" r="4"/>
+                <path d="M20 8v6M17 11h6"/>
+            </svg>
+            <span>Register</span>
+        </a>
+
+        <a href="/login" class="navbar-action">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M10 17l5-5-5-5"/>
+                <path d="M15 12H3"/>
+                <path d="M12 3h7a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-7"/>
+            </svg>
+            <span>Login</span>
+        </a>
+
+    </div>
+
 </nav>

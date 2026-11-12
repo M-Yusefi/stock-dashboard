@@ -4,17 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>{% block title %}Stock Dashboard{% endblock %}</title>
+    
     <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
 </head>
 <body>
-    {% include 'stocks/navbar.html' %}
+    <div class="dashboard-wrapper">
+        
+        {% include 'stocks/navbar.html' %}
 
-    <main class="container py-4">
-        {% block content %}
-        {% endblock %}
-    </main>
+        <main class="py-4">
+            {% block content %}
+            {% endblock %}
+        </main>
+
+    </div>
 
     <script>
         const searchStockUrl = "{% url 'search_stock' %}";
@@ -22,5 +28,6 @@
 
     <script src="{% static 'bootstrap/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static 'js/search.js' %}"></script>
+    
 </body>
 </html>

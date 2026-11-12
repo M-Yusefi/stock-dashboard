@@ -4,8 +4,64 @@
 
 {% block content %}
 
-<h1>Stock Analytics Dashboard</h1>
 
-<div id="res-container">
+<div id="res_container" class="dashboard-home">
+
+    <div class="welcome-section">
+        <span class="welcome-badge">STOCK ANALYTICS</span>
+
+        <h1>Understand the market.<br>
+            <span>Analyze your stocks.</span>
+        </h1>
+
+        <p>
+            Explore stock performance, analyze historical data
+            and discover important market statistics.
+            Enter a ticker symbol above to get started.
+        </p>
+
+        <div class="welcome-info">
+            <span>● Real-time API data</span>
+            <span>● Historical analysis</span>
+            <span>● Stock statistics</span>
+        </div>
+    </div>
+
+    <div class="feature-section">
+
+        <div class="feature-card">
+            <div class="feature-icon">↗</div>
+            <h5>Price Analysis</h5>
+            <p>
+                Explore price movements, percentage changes
+                and historical performance.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">▥</div>
+            <h5>Market Statistics</h5>
+            <p>
+                View average prices, highest values,
+                lowest values and trading volume.
+            </p>
+        </div>
+
+        <div class="feature-card">
+            <div class="feature-icon">⌁</div>
+            <h5>Historical Data</h5>
+            <p>
+                Analyze historical stock data and
+                discover interesting price movements.
+            </p>
+        </div>
+
+    </div>
+
+    <div class="dashboard-footer">
+        Select a stock using the search bar to start your analysis.
+    </div>
+
 </div>
+
 {% endblock %}
