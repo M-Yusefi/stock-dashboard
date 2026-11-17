@@ -91,6 +91,12 @@ def last_trading_day(data, historical):
     historical_average_price = historical['average_close_price']
     below_historical_average = close_price < historical_average_price
     price_difrance = close_price - historical_average_price
+    lastday_percetage_changes = 0
+
+    if latest_data['open'] != 0:
+        lastday_percetage_changes = (
+            (latest_data['close'] - latest_data['open']) / latest_data['open'] * 100  
+        )
 
     last_day_results = {
         "trading_date": trading_date,
@@ -99,7 +105,8 @@ def last_trading_day(data, historical):
         "volume": volume, 
         "average_daily_price": round(average_daily_price, 2),
         "below_historical_average": below_historical_average,
-        "price_difrance": round(price_difrance, 2) 
+        "price_difrance": round(price_difrance, 2), 
+        "lastday_percetage_changes": lastday_percetage_changes
     }
 
     return last_day_results

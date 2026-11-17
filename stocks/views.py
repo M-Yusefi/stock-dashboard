@@ -19,6 +19,8 @@ def load_ticker_data():
             "name": stock["name"],
             "sector": stock["sector"],
             "country": stock["country"],
+            "ipoyear": stock["ipoyear"],
+            "industry": stock["industry"],
         }
         for stock in json.loads(ticker_file.read_text(encoding="utf-8"))
     ]

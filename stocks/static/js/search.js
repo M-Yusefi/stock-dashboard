@@ -94,10 +94,31 @@ function searchTicker() {
           <div class="stock-header">
               <div>
                   <span class="stock-label">STOCK ANALYSIS</span>
-                  <h2>${ticker} <span class="${priceChangeClass}">${priceChangeSign}$${priceChangeValue}</span></h2>
-                  <h3>${extraInfo.name}</h3>
+                  <h2>${extraInfo.name} <span class="${priceChangeClass}">${priceChangeSign}$${priceChangeValue}</span></h2>
                   <p>Historical stock performance last 300 days</p>
               </div>
+
+              <aside class="company-information" aria-label="Company information">
+                <span class="stock-label">COMPANY PROFILE</span>
+                <table class="company-details" aria-label="Company details">
+                  <tbody>
+                    <tr>
+                      <th scope="row">Ticker</th>
+                      <th scope="row">Country</th>
+                      <th scope="row">Sector</th>
+                      <th scope="row">Industry</th>
+                      <th scope="row">IPO year</th>
+                    </tr>
+                    <tr>
+                      <td>${ticker}</td>
+                      <td>${extraInfo.country || "N/V"}</td>
+                      <td>${extraInfo.sector || "N/V"}</td>
+                      <td>${extraInfo.industry || "N/V"}</td>
+                      <td>${extraInfo.ipoyear || "N/V"}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </aside>
           </div>
 
           <div class="stock-chart-container">
@@ -194,7 +215,10 @@ function searchTicker() {
                 </div>
 
                 <div class="stock-card ${lastDay.below_historical_average ? 'red' : 'green'}">
-                    <span class="stat-label"><span class="material-symbols-outlined" aria-hidden="true">${lastDay.below_historical_average ? "trending_down" : "trending_up"}</span><span class="stat-label-text">Current vs Historical Average</span></span>
+                    <span class="stat-label">
+                      <span class="material-symbols-outlined" aria-hidden="true">${lastDay.below_historical_average ? "trending_down" : "trending_up"}</span>
+                      <span class="stat-label-text">Current vs Historical Average</span>
+                    </span>
                     <h3>$${Math.abs(Number(lastDay.price_difrance)).toFixed(2)}</h3>
                     <p>${lastDay.below_historical_average ? "Below average" : "At or above average"}</p>
                 </div>

@@ -1,29 +1,30 @@
 :root {
   /* Background */
-  --bg-primary: #0d0b14;
-  --bg-secondary: #171421;
-  --bg-card: #1e1a2b;
+  --bg-primary: #080f1c;
+  --bg-secondary: #111827;
+  --bg-card: #111c2f;
 
   /* Gradient */
   --gradient-primary: linear-gradient(
     135deg,
-    #211936 0%,
-    #30204d 20%,
-    #171421 100%
+    #0f1b33 0%,
+    #14284a 20%,
+    #080f1c 100%
   );
 
-  /* Purple accents */
-  --accent-primary: #9333ea;
-  --accent-secondary: #a855f7;
-  --accent-hover: #7e22ce;
+  /* Blue accents */
+  --accent-primary: #2563eb;
+  --accent-secondary: #60a5fa;
+  --accent-hover: #1d4ed8;
+  --accent-rgb: 37, 99, 235;
 
   /* Text */
-  --text-primary: #ffffff;
-  --text-secondary: #b8b2c7;
-  --text-muted: #817a91;
+  --text-primary: #f8fafc;
+  --text-secondary: #cbd5e1;
+  --text-muted: #94a3b8;
 
   /* Borders */
-  --border-color: #332b43;
+  --border-color: #253550;
 }
 
 body {
@@ -54,7 +55,7 @@ body {
     background:
         radial-gradient(
             circle at 80% 10%,
-            rgba(147, 51, 234, 0.15),
+            rgba(var(--accent-rgb), 0.15),
             transparent 35%
         ),
         var(--bg-primary);
@@ -113,7 +114,7 @@ body {
 
     #ticker-search-form:focus-within {
         border-color: var(--accent-primary);
-        box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.2);
+        box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.2);
     }
 
     #ticker-input {
@@ -204,7 +205,7 @@ main {
     background:
       radial-gradient(
         circle at 80% 10%,
-        rgba(147, 51, 234, 0.15),
+        rgba(var(--accent-rgb), 0.15),
         transparent 35%
       ),
       var(--bg-primary);
@@ -225,7 +226,7 @@ main {
     padding: 7px 14px;
     margin-bottom: 20px;
 
-    background: rgba(147, 51, 234, 0.15);
+    background: rgba(var(--accent-rgb), 0.15);
     border: 1px solid var(--accent-primary);
     border-radius: 50px;
 
@@ -284,7 +285,7 @@ main {
   .feature-card:hover {
     transform: translateY(-5px);
     border-color: var(--accent-primary);
-    box-shadow: 0 8px 25px rgba(147, 51, 234, 0.12);
+    box-shadow: 0 8px 25px rgba(var(--accent-rgb), 0.12);
   }
 
   .feature-icon {
@@ -296,7 +297,7 @@ main {
     height: 42px;
     margin-bottom: 20px;
 
-    background: rgba(147, 51, 234, 0.2);
+    background: rgba(var(--accent-rgb), 0.2);
     border-radius: 10px;
 
     color: var(--accent-secondary);
@@ -337,7 +338,7 @@ main {
     background:
         radial-gradient(
             circle at 80% 10%,
-            rgba(147, 51, 234, 0.12),
+            rgba(var(--accent-rgb), 0.12),
             transparent 35%
         ),
         var(--bg-primary);
@@ -390,6 +391,48 @@ main {
         font-size: 11px;
         font-weight: 700;
         letter-spacing: 2px;
+    }
+
+    .company-information {
+        flex: 1 1 380px;
+        min-width: 0;
+        padding: 20px;
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 15px;
+    }
+
+    .company-information h3 {
+        margin: 8px 0 14px;
+        color: var(--text-primary);
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 1.35;
+    }
+
+    .company-details {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    .company-details th,
+    .company-details td {
+        padding: 8px 0;
+        border-top: 1px solid var(--border-color);
+    }
+
+    .company-details th {
+        color: var(--text-muted);
+        font-size: 13px;
+        font-weight: 500;
+        text-align: left;
+    }
+
+    .company-details td {
+        color: var(--text-secondary);
+        font-size: 14px;
+        font-weight: 600;
+        text-align: left;
     }
 
     .stock-header h2 {
@@ -557,6 +600,11 @@ main {
     .stock-header {
         align-items: flex-start;
         flex-direction: column;
+    }
+
+    .company-information {
+        width: 100%;
+        min-width: 0;
     }
 }
 
