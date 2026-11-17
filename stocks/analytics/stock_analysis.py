@@ -22,7 +22,7 @@ def historical_analysis(data):
     daily_percentage_changes = []
     closing_prices = []
     trading_volumes = []
-
+    trading_dates = []
     for i in data:
         daily_absolute_changes.append(i['close'] - i['open'])
 
@@ -33,6 +33,8 @@ def historical_analysis(data):
 
         closing_prices.append(i['close'])
         trading_volumes.append(i['volume'])
+        trading_dates.append(i['date'])
+        
 
 
     highest_close_price = max(closing_prices)
@@ -60,6 +62,9 @@ def historical_analysis(data):
         "lowest_close_price": round(lowest_close_price, 2),
         "highest_close_date": highest_close_date,
         "lowest_close_date": lowest_close_date,
+
+        "trading_dates": trading_dates,
+        "closing_price": closing_prices,
 
         "average_volume": round(average_volume),
         "highest_volume": round(highest_volume),

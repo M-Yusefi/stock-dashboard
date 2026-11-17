@@ -22,8 +22,10 @@
             oninput="this.value = this.value.toUpperCase()"
             placeholder="Search stock ticker, e.g. AAPL"
             autocomplete="off"
+            list="ticker-suggestions"
             required
         />
+        <datalist id="ticker-suggestions"></datalist>
 
         <button type="submit">Search</button>
     </form>
