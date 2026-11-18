@@ -98,7 +98,7 @@ function searchTicker() {
                   <p>Historical stock performance last 300 days</p>
               </div>
 
-              <aside class="company-information" aria-label="Company information">
+              <div class="company-information" aria-label="Company information">
                 <span class="stock-label">COMPANY PROFILE</span>
                 <table class="company-details" aria-label="Company details">
                   <tbody>
@@ -118,7 +118,7 @@ function searchTicker() {
                     </tr>
                   </tbody>
                 </table>
-              </aside>
+              </div>
           </div>
 
           <div class="stock-chart-container">

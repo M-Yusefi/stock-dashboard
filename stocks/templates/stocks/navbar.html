@@ -4,9 +4,9 @@
 <nav id="navbar" class="navbar">
 
     <!-- Links: Logo en naam -->
-    <a id="navbar_link" href="/stocks">
+    <a id="navbar_link" href="/">
         <img
-            src="{% static 'images/logo-STAB.jpg' %}"
+            src="{% static 'stocks/images/logo-STAB.jpg' %}"
             alt="Stock Dashboard logo"
         />
         <span>Stock Dashboard</span>
@@ -33,7 +33,7 @@
     <!-- Rechts: Account navigatie -->
     <div class="navbar-actions">
 
-        <a href="/register" class="navbar-action">
+        <a href="/accounts/register" class="navbar-action">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                 <circle cx="10" cy="7" r="4"/>
@@ -42,7 +42,7 @@
             <span>Register</span>
         </a>
 
-        <a href="/login" class="navbar-action">
+        <a href="/accounts/login" class="navbar-action">
             <svg viewBox="0 0 24 24" aria-hidden="true">
                 <path d="M10 17l5-5-5-5"/>
                 <path d="M15 12H3"/>
