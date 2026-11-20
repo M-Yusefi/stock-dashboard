@@ -3,8 +3,10 @@ import json
 from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse
+
 from .services.services import api_res
-from .analytics.stock_analysis import analyse
+from .services.services import get_stock_data
+from .analytics.stock_analyse import analyse
 
 
 def index(request):
@@ -33,12 +35,8 @@ def ticker_suggestions(request):
 def search_stock(request):
     ticker = request.GET.get("ticker")
 
-    api_response = api_res(ticker)
-    analyse_results = analyse(api_response)
-    extra_info = next(
-        (stock for stock in load_ticker_data() if stock["symbol"] == ticker.upper()),
-        None,
-    )
-    analyse_results["extra_info"] = extra_info
+    stock_data = get_stock_data(ticker)
+    analysis_results = analyse(stock_data["history"])
+    response_data = {**stock_data, **analysis_results}
 
-    return JsonResponse(analyse_results)
+    return JsonResponse(response_data)
