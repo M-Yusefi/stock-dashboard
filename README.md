@@ -15,6 +15,33 @@ Stock Analytics Dashboard
 
 Ik ontwikkel een webapplicatie waarmee gebruikers aandelen kunnen zoeken, koersgegevens kunnen ophalen en verschillende aandelen met elkaar kunnen vergelijken. Met Python bereken ik onder andere rendementen en koersveranderingen. De berekende resultaten worden binnen de Django-webapplicatie weergegeven en kunnen worden gebruikt om aandelen overzichtelijk te beoordelen.
 
+### Live demo
+
+[**Zie website**](https://analyse-stock.up.railway.app/)
+
+### Screenshots
+
+**Startpagina**
+
+![Startpagina van Stock Analytics Dashboard](README_assets/Screenshot%202026-11-23%20110352.png)
+
+**Aandelenanalyse en koersgrafiek**
+
+![Aandelenanalyse met koersgrafiek](README_assets/Screenshot%202026-11-23%20150044.png)
+
+**Bedrijfsprofiel en marktoverzicht**
+
+![Bedrijfsprofiel en marktoverzicht](README_assets/Screenshot%202026-11-23%20150118.png)
+
+**Historische analyse en laatste handelsdag**
+
+![Historische analyse en gegevens van de laatste handelsdag](README_assets/Screenshot%202026-11-23%20150132.png)
+
+**Historische gegevens en nieuws**
+
+![Tabel met historische gegevens en nieuwsartikelen](README_assets/Screenshot%202026-11-23%20150151.png)
+
+
 ### Waarom wil ik dit project maken?
 
 Ik wil mijn kennis van Python uitbreiden door een praktisch project te bouwen. Mijn focus ligt op het verwerken en analyseren van gegevens, het uitvoeren van berekeningen en het ontwikkelen van een webapplicatie met Django. Zo leer ik hoe Python wordt gebruikt voor het ophalen, verwerken en presenteren van financiële gegevens.
