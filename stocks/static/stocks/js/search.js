@@ -5,6 +5,7 @@ const results = document.getElementById("res_container");
 
 let tickers = [];
 let chart = null;
+let selectedPeriod = "1mo";
 
 const esc = (value) => String(value ?? "").replace(/[&<>"']/g, char =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[char])
@@ -93,7 +94,7 @@ function updateSuggestions() {
     });
 }
 
-function companyProfile(company, ticker) {
+function companyProfile(company, ticker, marketCap) {
   const website = externalUrl(company.website);
   const description = String(value(company.description));
   const details = [
@@ -101,6 +102,7 @@ function companyProfile(company, ticker) {
     ["Sector", company.sector],
     ["Industry", company.industry],
     ["Currency", company.currency],
+    ["Market cap", number(marketCap, 0)],
     ["Employees", number(company.employees, 0)],
     ["Website", website
       ? `<a href="${esc(website)}" target="_blank" rel="noopener noreferrer">${esc(company.website)}</a>`
@@ -194,22 +196,71 @@ function drawChart(history, analysis, code) {
   if (!canvas) return;
   if (chart) chart.destroy();
 
+  const averagePrice = Number(analysis.average_close_price);
+  const chartPoints = [];
+  history.forEach((record, index) => {
+    const price = Number(record.close);
+    chartPoints.push({ x: index, price, historyIndex: index });
+
+    const nextPrice = history[index + 1] ? Number(history[index + 1].close) : null;
+    if (
+      nextPrice !== null
+      && ((price < averagePrice && nextPrice > averagePrice)
+        || (price > averagePrice && nextPrice < averagePrice))
+    ) {
+      const crossingPosition = index + (averagePrice - price) / (nextPrice - price);
+      chartPoints.push({ x: crossingPosition, price: averagePrice, historyIndex: null });
+    }
+  });
+
+  const chartDateForPosition = position => {
+    const index = Math.max(0, Math.min(history.length - 1, Math.round(Number(position))));
+    return history[index]?.date || "";
+  };
+  const chartAxisDate = position => {
+    const numericPosition = Number(position);
+    if (numericPosition < 0 || numericPosition > history.length - 1) return "";
+    const date = chartDateForPosition(position);
+    const [, month, day] = date.split("-");
+    return month && day ? `${month}/${day}` : date;
+  };
+  const chartDateForTooltip = items => {
+    if (!items.length) return "";
+    const point = chartPoints[items[0].index];
+    return point ? chartDateForPosition(point.x) : "";
+  };
+
   chart = new Chart(canvas.getContext("2d"), {
     type: "line",
     data: {
-      labels: history.map(record => record.date),
       datasets: [
         {
-          label: "Closing price",
-          data: history.map(record => record.close),
+          label: "Closing price above average",
+          data: chartPoints.map(point => ({
+            x: point.x,
+            y: point.price >= averagePrice ? point.price : null
+          })),
           borderColor: "#16a34a",
-          backgroundColor: "rgba(22, 163, 74, 0.10)",
+          backgroundColor: "rgba(22, 163, 74, 0.18)",
           pointRadius: 2,
-          fill: true
+          lineTension: 0,
+          fill: 2
+        },
+        {
+          label: "Closing price below average",
+          data: chartPoints.map(point => ({
+            x: point.x,
+            y: point.price <= averagePrice ? point.price : null
+          })),
+          borderColor: "#dc2626",
+          backgroundColor: "rgba(220, 38, 38, 0.18)",
+          pointRadius: 2,
+          lineTension: 0,
+          fill: 2
         },
         {
           label: "Historical average",
-          data: history.map(() => analysis.average_close_price),
+          data: chartPoints.map(point => ({ x: point.x, y: averagePrice })),
           borderColor: "#f59e0b",
           borderDash: [6, 4],
           pointRadius: 0,
@@ -217,11 +268,15 @@ function drawChart(history, analysis, code) {
         },
         {
           label: "Highest close price",
-          data: history.map(record =>
-            record.date === analysis.highest_close_date ? analysis.highest_close_price : null
-          ),
-          borderColor: "#57ce83",
-          backgroundColor: "#053416",
+          data: chartPoints.map(point => ({
+            x: point.x,
+            y: point.historyIndex !== null
+              && history[point.historyIndex].date === analysis.highest_close_date
+              ? analysis.highest_close_price
+              : null
+          })),
+          borderColor: "#90ffb8",
+          backgroundColor: "#0f380a",
           pointRadius: 5,
           pointHoverRadius: 7,
           showLine: false,
@@ -229,11 +284,15 @@ function drawChart(history, analysis, code) {
         },
         {
           label: "Lowest close price",
-          data: history.map(record =>
-            record.date === analysis.lowest_close_date ? analysis.lowest_close_price : null
-          ),
-          borderColor: "#e90e0e",
-          backgroundColor: "#52110e",
+          data: chartPoints.map(point => ({
+            x: point.x,
+            y: point.historyIndex !== null
+              && history[point.historyIndex].date === analysis.lowest_close_date
+              ? analysis.lowest_close_price
+              : null
+          })),
+          borderColor: "#fea3a3",
+          backgroundColor: "#2b0303",
           pointRadius: 5,
           pointHoverRadius: 7,
           showLine: false,
@@ -249,24 +308,38 @@ function drawChart(history, analysis, code) {
         mode: "index",
         intersect: false,
         callbacks: {
+          title: chartDateForTooltip,
           label: (item, chartData) =>
             `${chartData.datasets[item.datasetIndex].label}: ${currency(item.yLabel, code)}`
         }
       },
       scales: {
-        xAxes: [{ ticks: { maxTicksLimit: 12, maxRotation: 0 } }],
+        xAxes: [{
+          type: "linear",
+          ticks: {
+            min: -0.5,
+            max: history.length - 0.5,
+            autoSkip: true,
+            maxTicksLimit: 12,
+            maxRotation: 0,
+            callback: chartAxisDate
+          }
+        }],
         yAxes: [{ ticks: { callback: item => currency(item, code) } }]
       }
     }
   });
 }
 
-async function searchTicker() {
+async function searchTicker(period = selectedPeriod) {
   const ticker = input.value.trim().toUpperCase();
   if (!ticker) return;
 
   try {
-    const response = await fetch(`${searchStockUrl}?ticker=${encodeURIComponent(ticker)}`);
+    selectedPeriod = period;
+    const response = await fetch(
+      `${searchStockUrl}?ticker=${encodeURIComponent(ticker)}&period=${encodeURIComponent(period)}`
+    );
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || `Stock search failed (${response.status})`);
     if (!data.historical_analysis || !data.last_trading_day) {
@@ -281,19 +354,46 @@ async function searchTicker() {
     const lastDay = data.last_trading_day;
     const code = company.currency || "USD";
     const change = Number(quote.change);
+    const hasMarketChange = quote.change !== null
+      && quote.change !== undefined
+      && Number.isFinite(change);
     const changeClass = change < 0 ? "stock-price-down" : "stock-price-up";
     const sign = change > 0 ? "+" : "";
     const changeText = quote.change == null
       ? ""
       : `${sign}${currency(quote.change, code)} (${sign}${number(quote.change_percent, 4)}%)`;
+    const preMarketPrice = quote.pre_market_price;
+    const hasPreMarketPrice = preMarketPrice !== null
+      && preMarketPrice !== undefined
+      && preMarketPrice !== ""
+      && Number.isFinite(Number(preMarketPrice));
+    const regularMarketPrice = Number(quote.price);
+    const hasRegularMarketPrice = quote.price !== null
+      && quote.price !== undefined
+      && quote.price !== ""
+      && Number.isFinite(regularMarketPrice)
+      && regularMarketPrice !== 0;
+    const preMarketChangePercent = hasPreMarketPrice && hasRegularMarketPrice
+      ? (Number(preMarketPrice) - regularMarketPrice) / regularMarketPrice * 100
+      : null;
+    const preMarketClass = hasRegularMarketPrice && Number(preMarketPrice) >= regularMarketPrice
+      ? "stock-price-up"
+      : "stock-price-down";
+    const preMarketPriceMarkup = hasPreMarketPrice
+      ? `<span class="stock-price-change ${preMarketClass}">Pre-market: ${esc(currency(preMarketPrice, code))}${preMarketChangePercent === null
+        ? ""
+        : ` (${preMarketChangePercent > 0 ? "+" : ""}${number(preMarketChangePercent, 2)}%)`}</span>`
+      : "";
+    const marketState = String(quote.market_state ?? "").trim();
+    const marketIsOpen = ["REGULAR", "OPEN"].includes(marketState.toUpperCase());
+    const marketStatusClass = marketIsOpen ? "market-status-open" : "market-status-closed";
+    const marketStatusText = marketState || "N/V";
 
     const quoteCards = [
-      ["Current price", currency(quote.price, code)],
-      ["Previous close", currency(quote.previous_close, code)],
+      ["Current price", currency(quote.price, code), "", quote.price < quote.previous_close ? "red" : "green"],
+      ["Previous close", currency(quote.previous_close, code), "", quote.previous_close < quote.price ? "red" : "green"],
       ["Daily change", currency(quote.change, code), "", change < 0 ? "red" : "green"],
       ["Daily change %", quote.change_percent == null ? "N/V" : `${number(quote.change_percent, 4)}%`, "", change < 0 ? "red" : "green"],
-      ["Market state", quote.market_state],
-      ["Market cap", number(quote.market_cap, 0)],
       ["Trading volume", number(quote.volume, 0)],
       ["Average volume", number(quote.average_volume, 0)],
       ["52-week high", currency(quote.fifty_two_week_high, code), "","green"],
@@ -325,17 +425,49 @@ async function searchTicker() {
 
     results.innerHTML = `<section class="stock-analysis">
       <header class="stock-header">
-        <span class="stock-label">STOCK ANALYSIS · ${esc(ticker)}</span>
-        <h2>${esc(value(company.name))}
-          <span class="stock-price-change ${changeClass}">${esc(currency(quote.price, code))}</span>
-        </h2>
-        <p>${changeText ? esc(changeText) : "Market quote details below"}</p>
+        <div class="header-left">
+          <span class="stock-label">STOCK ANALYSIS · ${esc(ticker)}</span>
+          <h2>${esc(value(company.name))}
+            <span class="stock-price-change ${changeClass}">${esc(currency(quote.price, code))}</span>
+            ${preMarketPriceMarkup}
+          </h2>
+          <p class="${hasMarketChange ? changeClass : ""}">${changeText ? esc(changeText) : "Market quote details below"}</p>
+        </div>
+
+        <div class="header-right">
+          <span class="market-status ${marketStatusClass}">
+            <span class="market-status-dot" aria-hidden="true"></span>${esc(marketStatusText)}
+          </span>
+        </div>
       </header>
 
       <div class="stock-chart-container"><canvas id="myChart" role="img" aria-label="Historical closing prices"></canvas></div>
+      <div class="periode-buttons" aria-label="Historical period">
+        ${[
+          ["1d", "1 day"],
+          ["5d", "5 days"],
+          ["1mo", "1 month"],
+          ["2mo", "2 months"],
+          ["3mo", "3 months"],
+          ["6mo", "6 months"],
+          ["1y", "1 year"],
+          ["2y", "2 years"],
+          ["5y", "5 years"],
+          ["10y", "10 years"],
+          ["ytd", "Year to date"],
+          ["max", "Max"]
+        ].map(([value, label]) => `
+          <button type="button"
+            class="periode-button${period === value ? " active" : ""}"
+            data-period="${value}"
+            aria-pressed="${period === value}">
+            ${esc(label)}
+          </button>
+        `).join("")}
+      </div>
 
       <div class="company-market-row">
-        ${companyProfile(company, ticker)}
+        ${companyProfile(company, ticker, quote.market_cap)}
         
         <section class="market-section">
           <h3>Market overview</h3>
@@ -368,6 +500,12 @@ async function searchTicker() {
     `;
 
     drawChart(history, analysis, code);
+
+    results.querySelectorAll(".periode-button").forEach(button => {
+      button.addEventListener("click", () => {
+        searchTicker(button.dataset.period);
+      });
+    });
   } catch (error) {
     console.error(error);
     results.innerHTML = `<div class="stock-error" role="alert">
@@ -381,5 +519,5 @@ loadTickers();
 input?.addEventListener("input", updateSuggestions);
 form?.addEventListener("submit", event => {
   event.preventDefault();
-  searchTicker();
+  searchTicker(selectedPeriod);
 });

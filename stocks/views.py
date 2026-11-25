@@ -34,8 +34,16 @@ def ticker_suggestions(request):
 
 def search_stock(request):
     ticker = request.GET.get("ticker")
+    period = request.GET.get("period", "1mo")
+    valid_periods = {
+        "1d", "5d", "1mo", "2mo", "3mo", "6mo",
+        "1y", "2y", "5y", "10y", "ytd", "max",
+    }
 
-    stock_data = get_stock_data(ticker)
+    if period not in valid_periods:
+        period = "1mo"
+
+    stock_data = get_stock_data(ticker, period)
     analysis_results = analyse(stock_data["history"])
     response_data = {**stock_data, **analysis_results}
 

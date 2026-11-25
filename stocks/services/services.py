@@ -26,14 +26,14 @@ def api_res(ticker):
     return response.json()
 
 
-def get_stock_data(ticker):
+def get_stock_data(ticker, period="1mo"):
     # 1. Maak een ticker-object aan
     stock = yf.Ticker(ticker.upper())
 
     # 2. Haal alleen de datasets op die nodig zijn voor de overview
     info = stock.info
     history = stock.history(
-        period="1y",
+        period=period,
         auto_adjust=False
     )
     raw_news = stock.news
@@ -53,9 +53,10 @@ def get_stock_data(ticker):
     # 4. Selecteer de koersinformatie
     quote = {
         "price": info.get("regularMarketPrice") or info.get("currentPrice"),
+        "pre_market_price": info.get("preMarketPrice"),
         "previous_close": info.get("regularMarketPreviousClose") or info.get("previousClose"),
         "change": info.get("regularMarketChange"),
-        "change_percent": info.get("regularMarketChangePercent"),
+        "change_percent": round(info.get("regularMarketChangePercent"), 2),
         "market_state": info.get("marketState"),
         "market_cap": info.get("marketCap"),
         "volume": info.get("regularMarketVolume") or info.get("volume"),
