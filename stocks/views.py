@@ -6,6 +6,7 @@ from django.http import JsonResponse
 
 from .services.services import api_res
 from .services.services import get_stock_data
+from .services.services import get_market_index_data
 from .analytics.stock_analyse import analyse
 
 
@@ -30,6 +31,13 @@ def load_ticker_data():
 
 def ticker_suggestions(request):
     return JsonResponse({"tickers": load_ticker_data()})
+
+
+def market_index(request):
+    try:
+        return JsonResponse(get_market_index_data("^GSPC"))
+    except Exception as exc:
+        return JsonResponse({"error": str(exc)}, status=502)
 
 
 def search_stock(request):

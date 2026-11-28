@@ -7,60 +7,97 @@
 
 <div id="res_container" class="dashboard-home">
 
-    <div class="welcome-section">
-        <span class="welcome-badge">STOCK ANALYTICS</span>
+    <section class="hero-section">
+        <div class="hero-main">
+            <h1>Understand the market.<br>Analyze your stocks.</h1>
 
-        <h1>Understand the market.<br>
-            <span>Analyze your stocks.</span>
-        </h1>
+            <label class="hero-search" for="ticker-input">
+                <input
+                    type="text"
+                    id="hero-ticker-input"
+                    aria-label="Search ticker or company"
+                    placeholder="Search ticker or company (e.g. AAPL, MSFT, ASML, NVDA)..."
+                >
+            </label>
 
-        <p>
-            Explore stock performance, analyze historical data
-            and discover important market statistics.
-            Enter a ticker symbol above to get started.
-        </p>
-
-        <div class="welcome-info">
-            <span>● Real-time API data</span>
-            <span>● Historical analysis</span>
-            <span>● Stock statistics</span>
+            <div class="quick-search">
+                <span>quick-search:</span>
+                <button type="button" data-ticker="AAPL">AAPL</button>
+                <button type="button" data-ticker="NVDA">NVDA</button>
+                <button type="button" data-ticker="TSLA">TSLA</button>
+            </div>
         </div>
-    </div>
 
-    <div class="feature-section">
+        <aside class="market-preview" aria-label="S&P 500 market preview">
+            <div class="market-preview-heading">
+                <div>
+                    <strong id="index-symbol">^GSPC</strong>
+                    <span id="index-name">(S&P 500)</span>
+                </div>
+                <svg class="trend-icon" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M3 17l5-5 4 3 7-8"/>
+                    <path d="M14 7h5v5"/>
+                </svg>
+            </div>
 
-        <div class="feature-card">
-            <div class="feature-icon">↗</div>
+            <div class="market-price">
+                <strong id="index-price">Laden...</strong>
+                <span id="index-change">Live data</span>
+            </div>
+
+            <svg id="index-chart" class="preview-chart" viewBox="0 0 520 170" role="img" aria-label="S&P 500 live price chart">
+                <defs>
+                    <linearGradient id="previewFill" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#60a5fa" stop-opacity=".28"/>
+                        <stop offset="100%" stop-color="#60a5fa" stop-opacity="0"/>
+                    </linearGradient>
+                </defs>
+                <path class="preview-area" d="M0 148 C28 145 42 150 66 138 C88 126 102 132 125 118 C145 108 162 122 184 110 C208 96 222 108 244 94 C264 82 281 91 302 76 C325 61 348 72 366 58 C388 43 402 64 424 48 C446 33 463 45 480 28 C494 17 508 20 520 10 L520 170 L0 170 Z"/>
+                <path class="preview-line" d="M0 148 C28 145 42 150 66 138 C88 126 102 132 125 118 C145 108 162 122 184 110 C208 96 222 108 244 94 C264 82 281 91 302 76 C325 61 348 72 366 58 C388 43 402 64 424 48 C446 33 463 45 480 28 C494 17 508 20 520 10"/>
+            </svg>
+
+            <div class="market-summary">
+                <div><span>Volume:</span><strong id="index-volume">--</strong></div>
+                <div><span>Day range:</span><strong id="index-day-range">--</strong></div>
+                <div><span>52W range:</span><strong id="index-52w-range">--</strong></div>
+            </div>
+        </aside>
+    </section>
+
+    <section class="feature-section">
+        <article class="feature-card">
             <h5>Price Analysis</h5>
-            <p>
-                Explore price movements, percentage changes
-                and historical performance.
-            </p>
-        </div>
+            <p>Koersverloop en relatieve<br>beweging</p>
+            <dl>
+                <div><dt>Huidige Koers:</dt><dd id="card-current-price">Laden...</dd></div>
+                <div><dt></dt><dd id="card-price-change" class="positive">Laden...</dd></div>
+                <div><dt>Open:</dt><dd id="card-open-price">--</dd></div>
+                <div><dt>Close:</dt><dd id="card-close-price">--</dd></div>
+            </dl>
+        </article>
 
-        <div class="feature-card">
-            <div class="feature-icon">▥</div>
+        <article class="feature-card">
             <h5>Market Statistics</h5>
-            <p>
-                View average prices, highest values,
-                lowest values and trading volume.
-            </p>
-        </div>
+            <p>Kengetallen voor volatiliteit en<br>liquiditeit</p>
+            <dl>
+                <div><dt>Gemiddelde Koers (30D):</dt><dd id="card-average-price">--</dd></div>
+                <div><dt>Hoogste Waarde (52W):</dt><dd id="card-52w-high">--</dd></div>
+                <div><dt>Laagste Waarde (52W):</dt><dd id="card-52w-low">--</dd></div>
+                <div><dt>Handelsvolume:</dt><dd id="card-volume">--</dd></div>
+            </dl>
+        </article>
 
-        <div class="feature-card">
-            <div class="feature-icon">⌁</div>
+        <article class="feature-card">
             <h5>Historical Data</h5>
-            <p>
-                Analyze historical stock data and
-                discover interesting price movements.
-            </p>
-        </div>
-
-    </div>
-
-    <div class="dashboard-footer">
-        Select a stock using the search bar to start your analysis.
-    </div>
+            <p>Terugkijken op eerdere<br>koersfasen</p>
+            <dl>
+                <div><dt>Trendinslagen</dt></div>
+                <div><dt>Historische reeksen</dt></div>
+                <div><dt>Vergelijking over tijd</dt></div>
+                <div><dt>Pieken/dalen</dt></div>
+            </dl>
+        </article>
+    </section>
 
 </div>
 

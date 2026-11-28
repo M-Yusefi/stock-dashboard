@@ -109,7 +109,7 @@ function companyProfile(company, ticker, marketCap) {
       : value(company.website)]
   ];
 
-  return `<section class="company-information" aria-label="Company information">
+  return `<section class="company-information stock-panel" aria-label="Company information">
     <span class="stock-label">Company Profile</span>
     <div>
       <h3>${esc(value(company.name))}</h3>
@@ -243,7 +243,7 @@ function drawChart(history, analysis, code) {
           borderColor: "#16a34a",
           backgroundColor: "rgba(22, 163, 74, 0.18)",
           pointRadius: 2,
-          lineTension: 0,
+          lineTension: 0.2,
           fill: 2
         },
         {
@@ -255,7 +255,7 @@ function drawChart(history, analysis, code) {
           borderColor: "#dc2626",
           backgroundColor: "rgba(220, 38, 38, 0.18)",
           pointRadius: 2,
-          lineTension: 0,
+          lineTension: 0.2,
           fill: 2
         },
         {
@@ -302,7 +302,7 @@ function drawChart(history, analysis, code) {
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true,
+      maintainAspectRatio: false,
       legend: { labels: { fontColor: "#b8b2c7" } },
       tooltips: {
         mode: "index",
@@ -440,50 +440,55 @@ async function searchTicker(period = selectedPeriod) {
           </span>
         </div>
       </header>
+      <div class="chart-market-overview">
+        <div class="chart-column">
+          <div class="stock-chart-container stock-panel"><canvas id="myChart" role="img" aria-label="Historical closing prices"></canvas></div>
+          <div class="periode-buttons" aria-label="Historical period">
+            ${[
+              ["1d", "1 day"],
+              ["5d", "5 days"],
+              ["1mo", "1 month"],
+              ["2mo", "2 months"],
+              ["3mo", "3 months"],
+              ["6mo", "6 months"],
+              ["1y", "1 year"],
+              ["2y", "2 years"],
+              ["5y", "5 years"],
+              ["10y", "10 years"],
+              ["ytd", "Year to date"],
+              ["max", "Max"]
+            ].map(([value, label]) => `
+              <button type="button"
+                class="periode-button${period === value ? " active" : ""}"
+                data-period="${value}"
+                aria-pressed="${period === value}">
+                ${esc(label)}
+              </button>
+            `).join("")}
+          </div>
+        </div>
 
-      <div class="stock-chart-container"><canvas id="myChart" role="img" aria-label="Historical closing prices"></canvas></div>
-      <div class="periode-buttons" aria-label="Historical period">
-        ${[
-          ["1d", "1 day"],
-          ["5d", "5 days"],
-          ["1mo", "1 month"],
-          ["2mo", "2 months"],
-          ["3mo", "3 months"],
-          ["6mo", "6 months"],
-          ["1y", "1 year"],
-          ["2y", "2 years"],
-          ["5y", "5 years"],
-          ["10y", "10 years"],
-          ["ytd", "Year to date"],
-          ["max", "Max"]
-        ].map(([value, label]) => `
-          <button type="button"
-            class="periode-button${period === value ? " active" : ""}"
-            data-period="${value}"
-            aria-pressed="${period === value}">
-            ${esc(label)}
-          </button>
-        `).join("")}
-      </div>
-
-      <div class="company-market-row">
-        ${companyProfile(company, ticker, quote.market_cap)}
-        
-        <section class="market-section">
+        <section class="market-section stock-panel">
           <h3>Market overview</h3>
           <div class="stock-statistics quote-statistics">${cardGrid(quoteCards)}</div>
         </section>
       </div>
+      <div class="chart-market-overview">
+        <div class="historical-data stock-panel">
+          <section class="stock-data-section"><h3>Historical data</h3>${historyTable(history, analysis, code)}</section>
+        </div>
+        ${companyProfile(company, ticker, quote.market_cap)}
+      </div>
 
       <div class="analysis-row">
-        <section class="analysis-column">
+        <section class="analysis-column stock-panel">
           <h3>Historical analysis</h3>
           <div class="stock-statistics">
             ${cardGrid(historyCards)}
           </div>
         </section>
 
-        <section class="analysis-column">
+        <section class="analysis-column stock-panel">
           <h3>Last trading day</h3>
           <div class="stock-statistics">
             ${cardGrid(dayCards)}
@@ -492,11 +497,12 @@ async function searchTicker(period = selectedPeriod) {
       </div>
 
       <section class="stock-data-section"><h3>Historical data</h3>${historyTable(history, analysis, code)}</section>
-        <section class="stock-data-section news-section">
-          <h3>News timeline <span class="news-count">${news.length}</span></h3>
-          ${newsTimeline(news)}
-        </section>
+
+      <section class="stock-data-section news-section">
+        <h3>News timeline <span class="news-count">${news.length}</span></h3>
+        ${newsTimeline(news)}
       </section>
+    </section>
     `;
 
     drawChart(history, analysis, code);
@@ -521,3 +527,109 @@ form?.addEventListener("submit", event => {
   event.preventDefault();
   searchTicker(selectedPeriod);
 });
+
+const heroInput = document.getElementById("hero-ticker-input");
+heroInput?.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    event.preventDefault();
+    if (input) input.value = heroInput.value;
+    searchTicker(selectedPeriod);
+  }
+});
+
+document.querySelectorAll(".quick-search [data-ticker]").forEach(button => {
+  button.addEventListener("click", () => {
+    if (input) input.value = button.dataset.ticker;
+    if (heroInput) heroInput.value = button.dataset.ticker;
+    searchTicker(selectedPeriod);
+  });
+});
+
+function compactNumber(item) {
+  const parsed = Number(item);
+  if (!Number.isFinite(parsed)) return "N/V";
+  return new Intl.NumberFormat(undefined, { notation: "compact", maximumFractionDigits: 1 }).format(parsed);
+}
+
+function drawIndexChart(chartData) {
+  const chart = document.getElementById("index-chart");
+  if (!chart) return;
+
+  const closes = chartData.map(item => Number(item.close)).filter(Number.isFinite);
+  if (!closes.length) return;
+
+  const width = 520;
+  const height = 170;
+  const padding = 8;
+  const min = Math.min(...closes);
+  const max = Math.max(...closes);
+  const range = max - min || 1;
+  const points = closes.map((close, index) => {
+    const x = padding + (index / Math.max(closes.length - 1, 1)) * (width - padding * 2);
+    const y = padding + ((max - close) / range) * (height - padding * 2);
+    return [x, y];
+  });
+
+  const line = points.map((point, index) =>
+    `${index === 0 ? "M" : "L"} ${point[0].toFixed(1)} ${point[1].toFixed(1)}`
+  ).join(" ");
+  const area = `${line} L ${width - padding} ${height} L ${padding} ${height} Z`;
+
+  chart.querySelectorAll(".preview-line, .preview-area").forEach(element => element.remove());
+  chart.insertAdjacentHTML("beforeend",
+    `<path class="preview-area" d="${area}"></path>
+     <path class="preview-line" d="${line}"></path>`
+  );
+}
+
+async function loadMarketIndex() {
+  try {
+    const response = await fetch(marketIndexUrl);
+    if (!response.ok) throw new Error("Could not load S&P 500 data.");
+    const data = await response.json();
+
+    const price = Number(data.price);
+    const change = Number(data.change);
+    const changePercent = Number(data.change_percent);
+    const priceElement = document.getElementById("index-price");
+    const changeElement = document.getElementById("index-change");
+
+    if (priceElement) priceElement.textContent = Number.isFinite(price)
+      ? price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+      : "N/V";
+
+    if (changeElement) {
+      const arrow = change > 0 ? "↗" : change < 0 ? "↘" : "—";
+      changeElement.textContent = `${arrow} ${Number.isFinite(change) ? change.toLocaleString(undefined, { maximumFractionDigits: 2 }) : "N/V"} (${Number.isFinite(changePercent) ? `${changePercent >= 0 ? "+" : ""}${changePercent.toFixed(2)}%` : "N/V"})`;
+      changeElement.style.color = change > 0 ? "#16a34a" : change < 0 ? "#dc2626" : "#94a3b8";
+    }
+
+    document.getElementById("index-symbol").textContent = data.symbol || "^GSPC";
+    document.getElementById("index-name").textContent = `(${data.name || "S&P 500"})`;
+    document.getElementById("index-volume").textContent = compactNumber(data.volume);
+    document.getElementById("index-day-range").textContent =
+      `${number(data.day_low)} - ${number(data.day_high)}`;
+    document.getElementById("index-52w-range").textContent =
+      `${number(data.fifty_two_week_low)} - ${number(data.fifty_two_week_high)}`;
+
+    document.getElementById("card-current-price").textContent =
+      Number.isFinite(price) ? price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : "N/V";
+    document.getElementById("card-price-change").textContent =
+      `${change > 0 ? "↗" : change < 0 ? "↘" : "—"} ${Number.isFinite(changePercent) ? `${changePercent >= 0 ? "+" : ""}${changePercent.toFixed(2)}%` : "N/V"}`;
+    document.getElementById("card-price-change").className = change > 0 ? "positive" : change < 0 ? "negative" : "";
+    document.getElementById("card-open-price").textContent = number(data.open);
+    document.getElementById("card-close-price").textContent = number(data.previous_close);
+    document.getElementById("card-average-price").textContent = number(data.average_close);
+    document.getElementById("card-52w-high").textContent = number(data.fifty_two_week_high);
+    document.getElementById("card-52w-low").textContent = number(data.fifty_two_week_low);
+    document.getElementById("card-volume").textContent = compactNumber(data.volume);
+    drawIndexChart(Array.isArray(data.chart) ? data.chart : []);
+  } catch (error) {
+    console.error(error);
+    const changeElement = document.getElementById("index-change");
+    if (changeElement) changeElement.textContent = "Live data unavailable";
+  }
+}
+
+loadMarketIndex();
+setInterval(loadMarketIndex, 60000);
